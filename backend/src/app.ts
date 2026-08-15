@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 
+import authRoutes from './routes/auth.routes.js';
+
 const app = express();
 
 app.use(cors());
@@ -12,5 +14,7 @@ app.get('/health', (_req, res) => {
     message: 'Voxter Netflix API is running',
   });
 });
+
+app.use('/auth', authRoutes);
 
 export default app;
