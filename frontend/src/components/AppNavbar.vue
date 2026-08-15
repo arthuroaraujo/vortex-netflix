@@ -59,18 +59,6 @@ function logout() {
         </template>
 
         <v-list>
-          <v-list-item>
-            <v-list-item-title>
-              {{ authStore.user?.name }}
-            </v-list-item-title>
-
-            <v-list-item-subtitle>
-              {{ authStore.user?.email }}
-            </v-list-item-subtitle>
-          </v-list-item>
-
-          <v-divider />
-
           <v-list-item
             prepend-icon="mdi-logout"
             @click="logout"
