@@ -5,13 +5,14 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(
-    'voxter_token',
-  );
+  const token = localStorage.getItem('token');
 
-  if (token) {
-    config.headers.Authorization =
-      `Bearer ${token}`;
+  const isAuthRoute =
+    config.url?.startsWith('/auth/login') ||
+    config.url?.startsWith('/auth/register');
+
+  if (token && !isAuthRoute) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;

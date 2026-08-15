@@ -1,29 +1,84 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const name = ref('');
-const email = ref('');
-const password = ref('');
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
 
 const loading = ref(false);
-const error = ref('');
+const error = ref("");
+
+const nameRules = [
+  (value: string) =>
+    !!value || "O nome é obrigatório.",
+];
+
+const emailRules = [
+  (value: string) =>
+    !!value || "O e-mail é obrigatório.",
+  (value: string) =>
+    /.+@.+\..+/.test(value) ||
+    "Digite um e-mail válido.",
+];
+
+const passwordRules = [
+  (value: string) =>
+    !!value || "A senha é obrigatória.",
+  (value: string) =>
+    value.length >= 6 ||
+    "A senha deve ter pelo menos 6 caracteres.",
+];
+
+const confirmPasswordRules = [
+  (value: string) =>
+    !!value ||
+    "Confirme sua senha.",
+  (value: string) =>
+    value === password.value ||
+    "As senhas não coincidem.",
+];
 
 async function handleRegister() {
-  error.value = '';
+  error.value = "";
 
   if (
     !name.value ||
     !email.value ||
-    !password.value
+    !password.value ||
+    !confirmPassword.value
   ) {
     error.value =
-      'Preencha todos os campos.';
+      "Preencha todos os campos.";
+    return;
+  }
+
+  if (
+    !/.+@.+\..+/.test(email.value)
+  ) {
+    error.value =
+      "Digite um e-mail válido.";
+    return;
+  }
+
+  if (password.value.length < 6) {
+    error.value =
+      "A senha deve ter pelo menos 6 caracteres.";
+    return;
+  }
+
+  if (
+    password.value !==
+    confirmPassword.value
+  ) {
+    error.value =
+      "As senhas não coincidem.";
     return;
   }
 
@@ -36,11 +91,13 @@ async function handleRegister() {
       password: password.value,
     });
 
-    await router.push('/');
+    await router.push('/login');
+
+    await router.push("/");
   } catch (err: any) {
     error.value =
       err.response?.data?.message ??
-      'Não foi possível criar a conta.';
+      "Não foi possível criar a conta.";
   } finally {
     loading.value = false;
   }
@@ -77,6 +134,8 @@ async function handleRegister() {
           v-model="name"
           label="Nome"
           prepend-inner-icon="mdi-account-outline"
+          :rules="nameRules"
+          validate-on="blur"
           class="mb-2"
         />
 
@@ -85,6 +144,8 @@ async function handleRegister() {
           label="E-mail"
           type="email"
           prepend-inner-icon="mdi-email-outline"
+          :rules="emailRules"
+          validate-on="blur"
           class="mb-2"
         />
 
@@ -93,6 +154,18 @@ async function handleRegister() {
           label="Senha"
           type="password"
           prepend-inner-icon="mdi-lock-outline"
+          :rules="passwordRules"
+          validate-on="blur"
+          class="mb-2"
+        />
+
+        <v-text-field
+          v-model="confirmPassword"
+          label="Confirmar senha"
+          type="password"
+          prepend-inner-icon="mdi-lock-check-outline"
+          :rules="confirmPasswordRules"
+          validate-on="blur"
           class="mb-4"
         />
 

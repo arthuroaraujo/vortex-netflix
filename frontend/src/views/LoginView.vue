@@ -1,24 +1,54 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const email = ref('');
-const password = ref('');
+const email = ref("");
+const password = ref("");
 
 const loading = ref(false);
-const error = ref('');
+const error = ref("");
+
+const emailRules = [
+  (value: string) =>
+    !!value || "O e-mail é obrigatório.",
+  (value: string) =>
+    /.+@.+\..+/.test(value) ||
+    "Digite um e-mail válido.",
+];
+
+const passwordRules = [
+  (value: string) =>
+    !!value || "A senha é obrigatória.",
+  (value: string) =>
+    value.length >= 6 ||
+    "A senha deve ter pelo menos 6 caracteres.",
+];
 
 async function handleLogin() {
-  error.value = '';
+  error.value = "";
 
   if (!email.value || !password.value) {
     error.value =
-      'Preencha e-mail e senha.';
+      "Preencha e-mail e senha.";
+    return;
+  }
+
+  if (
+    !/.+@.+\..+/.test(email.value)
+  ) {
+    error.value =
+      "Digite um e-mail válido.";
+    return;
+  }
+
+  if (password.value.length < 6) {
+    error.value =
+      "A senha deve ter pelo menos 6 caracteres.";
     return;
   }
 
@@ -30,11 +60,11 @@ async function handleLogin() {
       password: password.value,
     });
 
-    await router.push('/');
+    await router.push("/");
   } catch (err: any) {
     error.value =
       err.response?.data?.message ??
-      'Não foi possível realizar o login.';
+      "Não foi possível realizar o login.";
   } finally {
     loading.value = false;
   }
@@ -52,7 +82,7 @@ async function handleLogin() {
       <v-card-title
         class="text-h4 font-weight-bold text-center mb-6"
       >
-        Voxter
+        Flixter
       </v-card-title>
 
       <v-card-subtitle
@@ -76,6 +106,8 @@ async function handleLogin() {
           label="E-mail"
           type="email"
           prepend-inner-icon="mdi-email-outline"
+          :rules="emailRules"
+          validate-on="blur"
           class="mb-2"
         />
 
@@ -84,6 +116,8 @@ async function handleLogin() {
           label="Senha"
           type="password"
           prepend-inner-icon="mdi-lock-outline"
+          :rules="passwordRules"
+          validate-on="blur"
           class="mb-4"
         />
 
