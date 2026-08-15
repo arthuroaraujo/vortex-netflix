@@ -1,12 +1,8 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
+import { createApp } from "vue";
+import { createPinia } from "pinia";
 
-import App from './App.vue';
-import router from './router';
-import vuetify from './plugins/vuetify';
+import App from "./App.vue";
+import router from "./router";
+import vuetify from "./plugins/vuetify";
 
-createApp(App)
-  .use(createPinia())
-  .use(vuetify)
-  .use(router)
-  .mount('#app');
+createApp(App).use(createPinia()).use(vuetify).use(router).mount("#app");

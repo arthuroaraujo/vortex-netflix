@@ -10,10 +10,7 @@ import {
 
 import { useAuthStore } from "../stores/auth";
 
-import {
-  getMovieById,
-  type MovieDetails,
-} from "../services/MovieService";
+import { getMovieById, type MovieDetails } from "../services/MovieService";
 
 const route = useRoute();
 const router = useRouter();
@@ -34,10 +31,7 @@ const snackbar = ref(false);
 const snackbarMessage = ref("");
 const snackbarColor = ref("success");
 
-function showSnackbar(
-  message: string,
-  color = "success",
-) {
+function showSnackbar(message: string, color = "success") {
   snackbarMessage.value = message;
   snackbarColor.value = color;
   snackbar.value = true;
@@ -55,8 +49,7 @@ async function loadMovie() {
   try {
     movie.value = await getMovieById(imdbId);
   } catch {
-    error.value =
-      "Não foi possível carregar os detalhes do filme.";
+    error.value = "Não foi possível carregar os detalhes do filme.";
   } finally {
     loading.value = false;
   }
@@ -74,9 +67,7 @@ async function checkFavorite(imdbId: string) {
   try {
     const favorites = await getFavorites();
 
-    isFavorite.value = favorites.some(
-      (favorite) => favorite.imdbId === imdbId,
-    );
+    isFavorite.value = favorites.some((favorite) => favorite.imdbId === imdbId);
   } catch {
     isFavorite.value = false;
   }
@@ -104,16 +95,12 @@ async function addMovieToFavorites() {
 
     isFavorite.value = true;
 
-    showSnackbar(
-      "Filme adicionado à sua lista!",
-      "success",
-    );
+    showSnackbar("Filme adicionado à sua lista!", "success");
   } catch (err: any) {
     console.error(err);
 
     showSnackbar(
-      err.response?.data?.message ??
-        "Não foi possível adicionar o filme.",
+      err.response?.data?.message ?? "Não foi possível adicionar o filme.",
       "error",
     );
   } finally {
@@ -142,16 +129,12 @@ async function confirmRemove() {
     isFavorite.value = false;
     showRemoveDialog.value = false;
 
-    showSnackbar(
-      "Filme removido da sua lista.",
-      "success",
-    );
+    showSnackbar("Filme removido da sua lista.", "success");
   } catch (err: any) {
     console.error(err);
 
     showSnackbar(
-      err.response?.data?.message ??
-        "Não foi possível remover o filme.",
+      err.response?.data?.message ?? "Não foi possível remover o filme.",
       "error",
     );
   } finally {
@@ -181,37 +164,19 @@ onMounted(async () => {
     </v-btn>
 
     <!-- Loading -->
-    <div
-      v-if="loading"
-      class="d-flex justify-center py-16"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      />
+    <div v-if="loading" class="d-flex justify-center py-16">
+      <v-progress-circular indeterminate color="primary" size="64" />
     </div>
 
     <!-- Erro -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      variant="tonal"
-    >
+    <v-alert v-else-if="error" type="error" variant="tonal">
       {{ error }}
     </v-alert>
 
     <!-- Filme -->
-    <v-row
-      v-else-if="movie"
-      align="start"
-    >
+    <v-row v-else-if="movie" align="start">
       <!-- Poster -->
-      <v-col
-        cols="12"
-        md="4"
-        lg="3"
-      >
+      <v-col cols="12" md="4" lg="3">
         <v-img
           :src="movie.Poster"
           :alt="movie.Title"
@@ -220,27 +185,17 @@ onMounted(async () => {
           rounded
         >
           <template #error>
-            <div
-              class="d-flex align-center justify-center fill-height"
-            >
-              <v-icon size="64">
-                mdi-movie-open-outline
-              </v-icon>
+            <div class="d-flex align-center justify-center fill-height">
+              <v-icon size="64"> mdi-movie-open-outline </v-icon>
             </div>
           </template>
         </v-img>
       </v-col>
 
       <!-- Informações -->
-      <v-col
-        cols="12"
-        md="8"
-        lg="9"
-      >
+      <v-col cols="12" md="8" lg="9">
         <div>
-          <h1
-            class="text-h3 font-weight-bold mb-3"
-          >
+          <h1 class="text-h3 font-weight-bold mb-3">
             {{ movie.Title }}
           </h1>
 
@@ -258,10 +213,7 @@ onMounted(async () => {
               {{ movie.Genre }}
             </v-chip>
 
-            <v-chip
-              v-if="movie.imdbRating !== 'N/A'"
-              color="primary"
-            >
+            <v-chip v-if="movie.imdbRating !== 'N/A'" color="primary">
               ⭐ {{ movie.imdbRating }}
             </v-chip>
           </div>
@@ -293,13 +245,8 @@ onMounted(async () => {
         </div>
 
         <!-- Sinopse -->
-        <v-card
-          variant="tonal"
-          class="mt-8 mb-6"
-        >
-          <v-card-title>
-            Sinopse
-          </v-card-title>
+        <v-card variant="tonal" class="mt-8 mb-6">
+          <v-card-title> Sinopse </v-card-title>
 
           <v-card-text class="text-body-1">
             {{ movie.Plot }}
@@ -308,48 +255,25 @@ onMounted(async () => {
 
         <!-- Informações adicionais -->
         <v-list lines="two">
-          <v-list-item
-            title="Diretor"
-            :subtitle="movie.Director"
-          />
+          <v-list-item title="Diretor" :subtitle="movie.Director" />
 
-          <v-list-item
-            title="Elenco"
-            :subtitle="movie.Actors"
-          />
+          <v-list-item title="Elenco" :subtitle="movie.Actors" />
 
-          <v-list-item
-            title="Roteiro"
-            :subtitle="movie.Writer"
-          />
+          <v-list-item title="Roteiro" :subtitle="movie.Writer" />
 
-          <v-list-item
-            title="Idioma"
-            :subtitle="movie.Language"
-          />
+          <v-list-item title="Idioma" :subtitle="movie.Language" />
 
-          <v-list-item
-            title="País"
-            :subtitle="movie.Country"
-          />
+          <v-list-item title="País" :subtitle="movie.Country" />
 
-          <v-list-item
-            title="Prêmios"
-            :subtitle="movie.Awards"
-          />
+          <v-list-item title="Prêmios" :subtitle="movie.Awards" />
         </v-list>
       </v-col>
     </v-row>
 
     <!-- Dialog de confirmação -->
-    <v-dialog
-      v-model="showRemoveDialog"
-      max-width="480"
-    >
+    <v-dialog v-model="showRemoveDialog" max-width="480">
       <v-card>
-        <v-card-title
-          class="text-h6 font-weight-bold"
-        >
+        <v-card-title class="text-h6 font-weight-bold">
           Remover da minha lista?
         </v-card-title>
 
@@ -394,12 +318,7 @@ onMounted(async () => {
       {{ snackbarMessage }}
 
       <template #actions>
-        <v-btn
-          variant="text"
-          @click="snackbar = false"
-        >
-          Fechar
-        </v-btn>
+        <v-btn variant="text" @click="snackbar = false"> Fechar </v-btn>
       </template>
     </v-snackbar>
   </v-container>

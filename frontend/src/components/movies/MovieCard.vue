@@ -21,17 +21,10 @@ function viewDetails(imdbId: string) {
     hover
     @click="viewDetails(movie.imdbID)"
   >
-    <v-img
-      :src="movie.Poster"
-      :alt="movie.Title"
-      height="360"
-      cover
-    >
+    <v-img :src="movie.Poster" :alt="movie.Title" height="360" cover>
       <template #error>
         <div class="d-flex align-center justify-center fill-height">
-          <v-icon size="64">
-            mdi-movie-open-outline
-          </v-icon>
+          <v-icon size="64"> mdi-movie-open-outline </v-icon>
         </div>
       </template>
     </v-img>
@@ -40,9 +33,7 @@ function viewDetails(imdbId: string) {
       {{ movie.Title }}
     </v-card-title>
 
-    <v-card-subtitle>
-      {{ movie.Year }} · {{ movie.Type }}
-    </v-card-subtitle>
+    <v-card-subtitle> {{ movie.Year }} · {{ movie.Type }} </v-card-subtitle>
 
     <v-card-actions>
       <v-btn

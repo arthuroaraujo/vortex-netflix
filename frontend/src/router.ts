@@ -42,22 +42,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const token =
-    localStorage.getItem('voxter_token');
+  const token = localStorage.getItem("voxter_token");
 
-  if (
-    to.meta.requiresAuth &&
-    !token
-  ) {
-    return '/login';
+  if (to.meta.requiresAuth && !token) {
+    return "/login";
   }
 
-  if (
-    (to.name === 'login' ||
-      to.name === 'register') &&
-    token
-  ) {
-    return '/';
+  if ((to.name === "login" || to.name === "register") && token) {
+    return "/";
   }
 });
 

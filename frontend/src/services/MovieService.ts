@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Movie {
   Title: string;
@@ -44,26 +44,17 @@ export interface MovieSearchResponse {
 export async function searchMovies(
   title: string,
 ): Promise<MovieSearchResponse> {
-  const response =
-    await api.get<MovieSearchResponse>(
-      '/movies/search',
-      {
-        params: {
-          title,
-        },
-      },
-    );
+  const response = await api.get<MovieSearchResponse>("/movies/search", {
+    params: {
+      title,
+    },
+  });
 
   return response.data;
 }
 
-export async function getMovieById(
-  imdbId: string,
-): Promise<MovieDetails> {
-  const response =
-    await api.get<MovieDetails>(
-      `/movies/${imdbId}`,
-    );
+export async function getMovieById(imdbId: string): Promise<MovieDetails> {
+  const response = await api.get<MovieDetails>(`/movies/${imdbId}`);
 
   return response.data;
 }

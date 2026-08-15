@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted } from "vue";
 
-import AppNavbar from './components/AppNavbar.vue';
-import { useAuthStore } from './stores/auth';
+import AppNavbar from "./components/AppNavbar.vue";
+import { useAuthStore } from "./stores/auth";
 
 const authStore = useAuthStore();
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -9,18 +9,13 @@ const authStore = useAuthStore();
 function logout() {
   authStore.logout();
 
-  router.push('/login');
+  router.push("/login");
 }
 </script>
 
 <template>
-  <v-app-bar
-    color="surface"
-    elevation="2"
-  >
-    <v-container
-      class="d-flex align-center"
-    >
+  <v-app-bar color="surface" elevation="2">
+    <v-container class="d-flex align-center">
       <v-btn
         variant="text"
         class="text-h5 font-weight-bold"
@@ -48,24 +43,14 @@ function logout() {
         Minha Lista
       </v-btn>
 
-      <v-menu
-        v-if="authStore.isAuthenticated"
-      >
+      <v-menu v-if="authStore.isAuthenticated">
         <template #activator="{ props }">
-          <v-btn
-            v-bind="props"
-            icon="mdi-account-circle-outline"
-          />
+          <v-btn v-bind="props" icon="mdi-account-circle-outline" />
         </template>
 
         <v-list>
-          <v-list-item
-            prepend-icon="mdi-logout"
-            @click="logout"
-          >
-            <v-list-item-title>
-              Sair
-            </v-list-item-title>
+          <v-list-item prepend-icon="mdi-logout" @click="logout">
+            <v-list-item-title> Sair </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

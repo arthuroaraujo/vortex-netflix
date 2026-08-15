@@ -37,20 +37,16 @@ const featuredSeriesIds = [
 async function loadFeaturedMovies() {
   try {
     const results = await Promise.all(
-      featuredMovieIds.map((imdbId) =>
-        getMovieById(imdbId),
-      ),
+      featuredMovieIds.map((imdbId) => getMovieById(imdbId)),
     );
 
-    featuredMovies.value = results.map(
-      (movie) => ({
-        imdbID: movie.imdbID,
-        Title: movie.Title,
-        Year: movie.Year,
-        Type: movie.Type,
-        Poster: movie.Poster,
-      }),
-    );
+    featuredMovies.value = results.map((movie) => ({
+      imdbID: movie.imdbID,
+      Title: movie.Title,
+      Year: movie.Year,
+      Type: movie.Type,
+      Poster: movie.Poster,
+    }));
   } catch {
     featuredMovies.value = [];
   }
@@ -59,20 +55,16 @@ async function loadFeaturedMovies() {
 async function loadFeaturedSeries() {
   try {
     const results = await Promise.all(
-      featuredSeriesIds.map((imdbId) =>
-        getMovieById(imdbId),
-      ),
+      featuredSeriesIds.map((imdbId) => getMovieById(imdbId)),
     );
 
-    featuredSeries.value = results.map(
-      (movie) => ({
-        imdbID: movie.imdbID,
-        Title: movie.Title,
-        Year: movie.Year,
-        Type: movie.Type,
-        Poster: movie.Poster,
-      }),
-    );
+    featuredSeries.value = results.map((movie) => ({
+      imdbID: movie.imdbID,
+      Title: movie.Title,
+      Year: movie.Year,
+      Type: movie.Type,
+      Poster: movie.Poster,
+    }));
   } catch {
     featuredSeries.value = [];
   }
@@ -80,10 +72,7 @@ async function loadFeaturedSeries() {
 
 async function loadFeaturedContent() {
   try {
-    await Promise.all([
-      loadFeaturedMovies(),
-      loadFeaturedSeries(),
-    ]);
+    await Promise.all([loadFeaturedMovies(), loadFeaturedSeries()]);
   } finally {
     featuredLoading.value = false;
   }
@@ -93,8 +82,7 @@ async function handleSearch() {
   const title = search.value.trim();
 
   if (!title) {
-    error.value =
-      "Digite o nome de um filme ou série.";
+    error.value = "Digite o nome de um filme ou série.";
     return;
   }
 
@@ -108,13 +96,11 @@ async function handleSearch() {
     movies.value = result.Search ?? [];
 
     if (movies.value.length === 0) {
-      error.value =
-        "Nenhum filme ou série encontrado.";
+      error.value = "Nenhum filme ou série encontrado.";
     }
   } catch {
     movies.value = [];
-    error.value =
-      "Não foi possível realizar a busca.";
+    error.value = "Não foi possível realizar a busca.";
   } finally {
     loading.value = false;
   }
@@ -134,40 +120,23 @@ loadFeaturedContent();
     <!-- Hero -->
     <section class="hero-section mb-12">
       <div class="hero-content text-center">
-        <v-icon
-          size="48"
-          color="primary"
-          class="mb-4"
-        >
+        <v-icon size="48" color="primary" class="mb-4">
           mdi-movie-open-outline
         </v-icon>
 
-        <h1
-          class="text-h3 text-md-h2 font-weight-bold mb-4"
-        >
+        <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
           Encontre seu próximo filme
         </h1>
 
-        <p
-          class="text-subtitle-1 text-medium-emphasis mx-auto mb-8"
-        >
-          Explore filmes e séries, descubra novos
-          títulos e monte sua própria lista.
+        <p class="text-subtitle-1 text-medium-emphasis mx-auto mb-8">
+          Explore filmes e séries, descubra novos títulos e monte sua própria
+          lista.
         </p>
 
         <!-- Busca -->
-        <v-form
-          @submit.prevent="handleSearch"
-        >
-          <v-row
-            justify="center"
-            class="search-row"
-          >
-            <v-col
-              cols="12"
-              md="8"
-              lg="7"
-            >
+        <v-form @submit.prevent="handleSearch">
+          <v-row justify="center" class="search-row">
+            <v-col cols="12" md="8" lg="7">
               <v-text-field
                 v-model="search"
                 label="Buscar filme ou série"
@@ -179,11 +148,7 @@ loadFeaturedContent();
               />
             </v-col>
 
-            <v-col
-              cols="12"
-              md="3"
-              lg="2"
-            >
+            <v-col cols="12" md="3" lg="2">
               <v-btn
                 type="submit"
                 color="primary"
@@ -201,21 +166,14 @@ loadFeaturedContent();
     </section>
 
     <!-- Erro -->
-    <v-alert
-      v-if="error"
-      type="warning"
-      variant="tonal"
-      class="mb-8"
-    >
+    <v-alert v-if="error" type="warning" variant="tonal" class="mb-8">
       {{ error }}
     </v-alert>
 
     <!-- Busca em andamento -->
     <template v-if="loading">
       <div class="mb-6">
-        <h2 class="text-h5 font-weight-bold">
-          Buscando filmes...
-        </h2>
+        <h2 class="text-h5 font-weight-bold">Buscando filmes...</h2>
       </div>
 
       <v-row>
@@ -233,32 +191,17 @@ loadFeaturedContent();
     </template>
 
     <!-- Resultados -->
-    <template
-      v-else-if="movies.length > 0"
-    >
-      <div
-        class="d-flex align-center justify-space-between mb-6"
-      >
+    <template v-else-if="movies.length > 0">
+      <div class="d-flex align-center justify-space-between mb-6">
         <div>
-          <h2
-            class="text-h5 font-weight-bold"
-          >
-            Resultados da busca
-          </h2>
+          <h2 class="text-h5 font-weight-bold">Resultados da busca</h2>
 
-          <p
-            class="text-body-2 text-medium-emphasis mt-1"
-          >
-            Filmes e séries encontrados para
-            "{{ search }}"
+          <p class="text-body-2 text-medium-emphasis mt-1">
+            Filmes e séries encontrados para "{{ search }}"
           </p>
         </div>
 
-        <v-btn
-          variant="text"
-          prepend-icon="mdi-close"
-          @click="clearSearch"
-        >
+        <v-btn variant="text" prepend-icon="mdi-close" @click="clearSearch">
           Limpar busca
         </v-btn>
       </div>
@@ -278,24 +221,13 @@ loadFeaturedContent();
     </template>
 
     <!-- Conteúdo da Home -->
-    <template
-      v-else-if="
-        movies.length === 0 &&
-        !error
-      "
-    >
+    <template v-else-if="movies.length === 0 && !error">
       <!-- Filmes -->
       <section class="mb-12">
         <div class="mb-6">
-          <h2
-            class="text-h5 font-weight-bold mb-2"
-          >
-            Filmes em destaque
-          </h2>
+          <h2 class="text-h5 font-weight-bold mb-2">Filmes em destaque</h2>
 
-          <p
-            class="text-body-2 text-medium-emphasis"
-          >
+          <p class="text-body-2 text-medium-emphasis">
             Alguns filmes que vale a pena conhecer.
           </p>
         </div>
@@ -330,15 +262,9 @@ loadFeaturedContent();
       <!-- Séries -->
       <section>
         <div class="mb-6">
-          <h2
-            class="text-h5 font-weight-bold mb-2"
-          >
-            Séries em destaque
-          </h2>
+          <h2 class="text-h5 font-weight-bold mb-2">Séries em destaque</h2>
 
-          <p
-            class="text-body-2 text-medium-emphasis"
-          >
+          <p class="text-body-2 text-medium-emphasis">
             Séries populares para você descobrir.
           </p>
         </div>
@@ -377,12 +303,11 @@ loadFeaturedContent();
 .hero-section {
   padding: 48px 24px;
   border-radius: 16px;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(229, 9, 20, 0.12),
-      transparent 65%
-    );
+  background: radial-gradient(
+    circle at center,
+    rgba(229, 9, 20, 0.12),
+    transparent 65%
+  );
 }
 
 .hero-content {

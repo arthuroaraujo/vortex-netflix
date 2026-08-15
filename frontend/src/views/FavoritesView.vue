@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import {
   getFavorites,
   removeFavorite,
   type Favorite,
-} from '../services/FavoriteService';
+} from "../services/FavoriteService";
 
 const router = useRouter();
 
 const favorites = ref<Favorite[]>([]);
 const loading = ref(true);
-const error = ref('');
+const error = ref("");
 
 const removingId = ref<string | null>(null);
 
@@ -21,14 +21,13 @@ const favoriteToRemove = ref<Favorite | null>(null);
 
 async function loadFavorites() {
   loading.value = true;
-  error.value = '';
+  error.value = "";
 
   try {
     favorites.value = await getFavorites();
   } catch (err: any) {
     error.value =
-      err.response?.data?.message ??
-      'Não foi possível carregar sua lista.';
+      err.response?.data?.message ?? "Não foi possível carregar sua lista.";
   } finally {
     loading.value = false;
   }
@@ -39,7 +38,7 @@ function openMovie(imdbId: string) {
 }
 
 function goToCatalog() {
-  router.push('/');
+  router.push("/");
 }
 
 function confirmRemove(favorite: Favorite) {
@@ -60,7 +59,7 @@ async function handleRemove() {
   const imdbId = favoriteToRemove.value.imdbId;
 
   removingId.value = imdbId;
-  error.value = '';
+  error.value = "";
 
   try {
     await removeFavorite(imdbId);
@@ -73,8 +72,7 @@ async function handleRemove() {
     favoriteToRemove.value = null;
   } catch (err: any) {
     error.value =
-      err.response?.data?.message ??
-      'Não foi possível remover o filme.';
+      err.response?.data?.message ?? "Não foi possível remover o filme.";
   } finally {
     removingId.value = null;
   }
@@ -86,34 +84,18 @@ onMounted(loadFavorites);
 <template>
   <v-container class="py-8">
     <div class="mb-8">
-      <h1 class="text-h4 font-weight-bold mb-2">
-        Minha Lista
-      </h1>
+      <h1 class="text-h4 font-weight-bold mb-2">Minha Lista</h1>
 
-      <p class="text-medium-emphasis">
-        Seus filmes e séries favoritos
-      </p>
+      <p class="text-medium-emphasis">Seus filmes e séries favoritos</p>
     </div>
 
-    <v-alert
-      v-if="error"
-      type="error"
-      variant="tonal"
-      class="mb-6"
-    >
+    <v-alert v-if="error" type="error" variant="tonal" class="mb-6">
       {{ error }}
     </v-alert>
 
     <!-- Loading -->
-    <div
-      v-if="loading"
-      class="d-flex justify-center py-16"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="48"
-      />
+    <div v-if="loading" class="d-flex justify-center py-16">
+      <v-progress-circular indeterminate color="primary" size="48" />
     </div>
 
     <!-- Lista vazia -->
@@ -121,23 +103,15 @@ onMounted(loadFavorites);
       v-else-if="favorites.length === 0"
       class="empty-state text-center py-16"
     >
-      <v-icon
-        size="72"
-        color="primary"
-        class="mb-6"
-      >
+      <v-icon size="72" color="primary" class="mb-6">
         mdi-heart-outline
       </v-icon>
 
-      <h2 class="text-h5 font-weight-bold mb-3">
-        Sua lista está vazia
-      </h2>
+      <h2 class="text-h5 font-weight-bold mb-3">Sua lista está vazia</h2>
 
-      <p
-        class="text-body-1 text-medium-emphasis mb-6"
-      >
-        Adicione filmes e séries aos seus favoritos
-        para encontrá-los aqui depois.
+      <p class="text-body-1 text-medium-emphasis mb-6">
+        Adicione filmes e séries aos seus favoritos para encontrá-los aqui
+        depois.
       </p>
 
       <v-btn
@@ -173,12 +147,8 @@ onMounted(loadFavorites);
             cover
           >
             <template #error>
-              <div
-                class="d-flex align-center justify-center fill-height"
-              >
-                <v-icon size="64">
-                  mdi-movie-open-outline
-                </v-icon>
+              <div class="d-flex align-center justify-center fill-height">
+                <v-icon size="64"> mdi-movie-open-outline </v-icon>
               </div>
             </template>
           </v-img>
@@ -188,7 +158,7 @@ onMounted(loadFavorites);
           </v-card-title>
 
           <v-card-subtitle>
-            {{ favorite.year || 'Ano não informado' }}
+            {{ favorite.year || "Ano não informado" }}
           </v-card-subtitle>
 
           <v-spacer />
@@ -197,9 +167,7 @@ onMounted(loadFavorites);
             <v-btn
               color="primary"
               variant="text"
-              @click.stop="
-                openMovie(favorite.imdbId)
-              "
+              @click.stop="openMovie(favorite.imdbId)"
             >
               Ver detalhes
             </v-btn>
@@ -210,17 +178,10 @@ onMounted(loadFavorites);
               icon="mdi-delete-outline"
               variant="text"
               color="error"
-              :loading="
-                removingId === favorite.imdbId
-              "
-              :disabled="
-                removingId !== null &&
-                removingId !== favorite.imdbId
-              "
+              :loading="removingId === favorite.imdbId"
+              :disabled="removingId !== null && removingId !== favorite.imdbId"
               aria-label="Remover dos favoritos"
-              @click.stop="
-                confirmRemove(favorite)
-              "
+              @click.stop="confirmRemove(favorite)"
             />
           </v-card-actions>
         </v-card>
@@ -228,14 +189,9 @@ onMounted(loadFavorites);
     </v-row>
 
     <!-- Confirmação de remoção -->
-    <v-dialog
-      v-model="showDeleteDialog"
-      max-width="480"
-    >
+    <v-dialog v-model="showDeleteDialog" max-width="480">
       <v-card>
-        <v-card-title
-          class="text-h6 font-weight-bold"
-        >
+        <v-card-title class="text-h6 font-weight-bold">
           Remover da minha lista?
         </v-card-title>
 

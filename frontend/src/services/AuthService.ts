@@ -22,42 +22,24 @@ export interface RegisterData {
   password: string;
 }
 
-export async function login(
-  data: LoginData,
-): Promise<AuthResponse> {
-  const response =
-    await api.post<AuthResponse>(
-      "/auth/login",
-      data,
-    );
+export async function login(data: LoginData): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>("/auth/login", data);
 
   return response.data;
 }
 
-export async function register(
-  data: RegisterData,
-): Promise<AuthResponse> {
-  const response =
-    await api.post<AuthResponse>(
-      "/auth/register",
-      data,
-    );
+export async function register(data: RegisterData): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>("/auth/register", data);
 
   return response.data;
 }
 
-export async function getMe(
-  token: string,
-): Promise<User> {
-  const response =
-    await api.get<User>(
-      "/auth/me",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+export async function getMe(token: string): Promise<User> {
+  const response = await api.get<User>("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 }
