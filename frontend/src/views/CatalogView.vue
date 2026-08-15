@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
-import MovieCard from '../components/movies/MovieCard.vue';
+import MovieCard from "../components/movies/MovieCard.vue";
+import MovieCardSkeleton from "../components/movies/MovieCardSkeleton.vue";
 
 import {
   searchMovies,
   getMovieById,
   type Movie,
-} from '../services/MovieService';
+} from "../services/MovieService";
 
-const search = ref('');
+const search = ref("");
 const movies = ref<Movie[]>([]);
 const featuredMovies = ref<Movie[]>([]);
+
 const loading = ref(false);
 const featuredLoading = ref(true);
-const error = ref('');
+
+const error = ref("");
 
 const featuredMovieIds = [
-  'tt0372784', // Batman Begins
-  'tt0468569', // The Dark Knight
-  'tt4154796', // Avengers: Endgame
-  'tt1375666', // Inception
+  "tt0372784", // Batman Begins
+  "tt0468569", // The Dark Knight
+  "tt4154796", // Avengers: Endgame
+  "tt1375666", // Inception
 ];
 
 async function loadFeaturedMovies() {
@@ -31,13 +34,15 @@ async function loadFeaturedMovies() {
       ),
     );
 
-    featuredMovies.value = results.map((movie) => ({
-      imdbID: movie.imdbID,
-      Title: movie.Title,
-      Year: movie.Year,
-      Type: movie.Type,
-      Poster: movie.Poster,
-    }));
+    featuredMovies.value = results.map(
+      (movie) => ({
+        imdbID: movie.imdbID,
+        Title: movie.Title,
+        Year: movie.Year,
+        Type: movie.Type,
+        Poster: movie.Poster,
+      }),
+    );
   } catch {
     featuredMovies.value = [];
   } finally {
@@ -50,12 +55,13 @@ async function handleSearch() {
 
   if (!title) {
     error.value =
-      'Digite o nome de um filme ou série.';
+      "Digite o nome de um filme ou série.";
     return;
   }
 
   loading.value = true;
-  error.value = '';
+  error.value = "";
+  movies.value = [];
 
   try {
     const result = await searchMovies(title);
@@ -64,12 +70,12 @@ async function handleSearch() {
 
     if (movies.value.length === 0) {
       error.value =
-        'Nenhum filme ou série encontrado.';
+        "Nenhum filme ou série encontrado.";
     }
   } catch {
     movies.value = [];
     error.value =
-      'Não foi possível realizar a busca.';
+      "Não foi possível realizar a busca.";
   } finally {
     loading.value = false;
   }
@@ -80,6 +86,7 @@ loadFeaturedMovies();
 
 <template>
   <v-container class="py-8">
+    <!-- Cabeçalho -->
     <div class="mb-8">
       <h1 class="text-h3 font-weight-bold mb-2">
         Flixter
@@ -90,6 +97,7 @@ loadFeaturedMovies();
       </p>
     </div>
 
+    <!-- Busca -->
     <v-form
       class="mb-10"
       @submit.prevent="handleSearch"
@@ -127,6 +135,7 @@ loadFeaturedMovies();
       </v-row>
     </v-form>
 
+    <!-- Erro -->
     <v-alert
       v-if="error"
       type="warning"
@@ -137,28 +146,42 @@ loadFeaturedMovies();
     </v-alert>
 
     <!-- Filmes em destaque -->
-    <template v-if="movies.length === 0 && !error">
+    <template
+      v-if="
+        movies.length === 0 &&
+        !error
+      "
+    >
       <div class="mb-6">
-        <h2 class="text-h5 font-weight-bold mb-2">
+        <h2
+          class="text-h5 font-weight-bold mb-2"
+        >
           Filmes em destaque
         </h2>
 
-        <p class="text-body-2 text-medium-emphasis">
-          Confira alguns filmes selecionados para você.
+        <p
+          class="text-body-2 text-medium-emphasis"
+        >
+          Confira alguns filmes selecionados
+          para você.
         </p>
       </div>
 
-      <div
-        v-if="featuredLoading"
-        class="d-flex justify-center py-12"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="48"
-        />
-      </div>
+      <!-- Skeleton dos destaques -->
+      <v-row v-if="featuredLoading">
+        <v-col
+          v-for="index in 4"
+          :key="`featured-skeleton-${index}`"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <MovieCardSkeleton />
+        </v-col>
+      </v-row>
 
+      <!-- Destaques carregados -->
       <v-row v-else>
         <v-col
           v-for="movie in featuredMovies"
@@ -173,8 +196,32 @@ loadFeaturedMovies();
       </v-row>
     </template>
 
+    <!-- Carregando resultados da busca -->
+    <template v-if="loading">
+      <div class="mb-6">
+        <h2 class="text-h5 font-weight-bold">
+          Buscando filmes...
+        </h2>
+      </div>
+
+      <v-row>
+        <v-col
+          v-for="index in 8"
+          :key="`search-skeleton-${index}`"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <MovieCardSkeleton />
+        </v-col>
+      </v-row>
+    </template>
+
     <!-- Resultados da busca -->
-    <template v-if="movies.length > 0">
+    <template
+      v-else-if="movies.length > 0"
+    >
       <div class="mb-6">
         <h2 class="text-h5 font-weight-bold">
           Resultados da busca
