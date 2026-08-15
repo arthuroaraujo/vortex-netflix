@@ -13,7 +13,11 @@ const router = useRouter();
 const favorites = ref<Favorite[]>([]);
 const loading = ref(true);
 const error = ref('');
+
 const removingId = ref<string | null>(null);
+
+const showDeleteDialog = ref(false);
+const favoriteToRemove = ref<Favorite | null>(null);
 
 async function loadFavorites() {
   loading.value = true;
@@ -30,10 +34,30 @@ async function loadFavorites() {
   }
 }
 
-async function handleRemove(imdbId: string) {
-  if (removingId.value) {
+function openMovie(imdbId: string) {
+  router.push(`/movies/${imdbId}`);
+}
+
+function goToCatalog() {
+  router.push('/');
+}
+
+function confirmRemove(favorite: Favorite) {
+  favoriteToRemove.value = favorite;
+  showDeleteDialog.value = true;
+}
+
+function cancelRemove() {
+  showDeleteDialog.value = false;
+  favoriteToRemove.value = null;
+}
+
+async function handleRemove() {
+  if (!favoriteToRemove.value) {
     return;
   }
+
+  const imdbId = favoriteToRemove.value.imdbId;
 
   removingId.value = imdbId;
   error.value = '';
@@ -44,6 +68,9 @@ async function handleRemove(imdbId: string) {
     favorites.value = favorites.value.filter(
       (favorite) => favorite.imdbId !== imdbId,
     );
+
+    showDeleteDialog.value = false;
+    favoriteToRemove.value = null;
   } catch (err: any) {
     error.value =
       err.response?.data?.message ??
@@ -51,14 +78,6 @@ async function handleRemove(imdbId: string) {
   } finally {
     removingId.value = null;
   }
-}
-
-function openMovie(imdbId: string) {
-  router.push(`/movies/${imdbId}`);
-}
-
-function goToCatalog() {
-  router.push('/');
 }
 
 onMounted(loadFavorites);
@@ -114,7 +133,9 @@ onMounted(loadFavorites);
         Sua lista está vazia
       </h2>
 
-      <p class="text-body-1 text-medium-emphasis mb-6">
+      <p
+        class="text-body-1 text-medium-emphasis mb-6"
+      >
         Adicione filmes e séries aos seus favoritos
         para encontrá-los aqui depois.
       </p>
@@ -176,7 +197,9 @@ onMounted(loadFavorites);
             <v-btn
               color="primary"
               variant="text"
-              @click.stop="openMovie(favorite.imdbId)"
+              @click.stop="
+                openMovie(favorite.imdbId)
+              "
             >
               Ver detalhes
             </v-btn>
@@ -187,18 +210,65 @@ onMounted(loadFavorites);
               icon="mdi-delete-outline"
               variant="text"
               color="error"
-              :loading="removingId === favorite.imdbId"
+              :loading="
+                removingId === favorite.imdbId
+              "
               :disabled="
                 removingId !== null &&
                 removingId !== favorite.imdbId
               "
               aria-label="Remover dos favoritos"
-              @click.stop="handleRemove(favorite.imdbId)"
+              @click.stop="
+                confirmRemove(favorite)
+              "
             />
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Confirmação de remoção -->
+    <v-dialog
+      v-model="showDeleteDialog"
+      max-width="480"
+    >
+      <v-card>
+        <v-card-title
+          class="text-h6 font-weight-bold"
+        >
+          Remover da minha lista?
+        </v-card-title>
+
+        <v-card-text>
+          Tem certeza que deseja remover
+          <strong>
+            {{ favoriteToRemove?.title }}
+          </strong>
+          da sua lista?
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer />
+
+          <v-btn
+            variant="text"
+            :disabled="removingId !== null"
+            @click="cancelRemove"
+          >
+            Cancelar
+          </v-btn>
+
+          <v-btn
+            color="error"
+            variant="flat"
+            :loading="removingId !== null"
+            @click="handleRemove"
+          >
+            Remover
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
