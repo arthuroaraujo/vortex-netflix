@@ -5,13 +5,45 @@ import MovieCard from '../components/movies/MovieCard.vue';
 
 import {
   searchMovies,
+  getMovieById,
   type Movie,
 } from '../services/MovieService';
 
 const search = ref('');
 const movies = ref<Movie[]>([]);
+const featuredMovies = ref<Movie[]>([]);
 const loading = ref(false);
+const featuredLoading = ref(true);
 const error = ref('');
+
+const featuredMovieIds = [
+  'tt0372784', // Batman Begins
+  'tt0468569', // The Dark Knight
+  'tt4154796', // Avengers: Endgame
+  'tt1375666', // Inception
+];
+
+async function loadFeaturedMovies() {
+  try {
+    const results = await Promise.all(
+      featuredMovieIds.map((imdbId) =>
+        getMovieById(imdbId),
+      ),
+    );
+
+    featuredMovies.value = results.map((movie) => ({
+      imdbID: movie.imdbID,
+      Title: movie.Title,
+      Year: movie.Year,
+      Type: movie.Type,
+      Poster: movie.Poster,
+    }));
+  } catch {
+    featuredMovies.value = [];
+  } finally {
+    featuredLoading.value = false;
+  }
+}
 
 async function handleSearch() {
   const title = search.value.trim();
@@ -42,15 +74,15 @@ async function handleSearch() {
     loading.value = false;
   }
 }
+
+loadFeaturedMovies();
 </script>
 
 <template>
-  <v-container
-    class="py-8"
-  >
+  <v-container class="py-8">
     <div class="mb-8">
       <h1 class="text-h3 font-weight-bold mb-2">
-        Voxter
+        Flixter
       </h1>
 
       <p class="text-subtitle-1 text-medium-emphasis">
@@ -59,7 +91,7 @@ async function handleSearch() {
     </div>
 
     <v-form
-      class="mb-8"
+      class="mb-10"
       @submit.prevent="handleSearch"
     >
       <v-row>
@@ -104,17 +136,63 @@ async function handleSearch() {
       {{ error }}
     </v-alert>
 
-    <v-row>
-      <v-col
-        v-for="movie in movies"
-        :key="movie.imdbID"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="3"
+    <!-- Filmes em destaque -->
+    <template v-if="movies.length === 0 && !error">
+      <div class="mb-6">
+        <h2 class="text-h5 font-weight-bold mb-2">
+          Filmes em destaque
+        </h2>
+
+        <p class="text-body-2 text-medium-emphasis">
+          Confira alguns filmes selecionados para você.
+        </p>
+      </div>
+
+      <div
+        v-if="featuredLoading"
+        class="d-flex justify-center py-12"
       >
-        <MovieCard :movie="movie" />
-      </v-col>
-    </v-row>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="48"
+        />
+      </div>
+
+      <v-row v-else>
+        <v-col
+          v-for="movie in featuredMovies"
+          :key="movie.imdbID"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <MovieCard :movie="movie" />
+        </v-col>
+      </v-row>
+    </template>
+
+    <!-- Resultados da busca -->
+    <template v-if="movies.length > 0">
+      <div class="mb-6">
+        <h2 class="text-h5 font-weight-bold">
+          Resultados da busca
+        </h2>
+      </div>
+
+      <v-row>
+        <v-col
+          v-for="movie in movies"
+          :key="movie.imdbID"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <MovieCard :movie="movie" />
+        </v-col>
+      </v-row>
+    </template>
   </v-container>
 </template>
