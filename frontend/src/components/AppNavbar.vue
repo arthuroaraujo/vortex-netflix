@@ -26,7 +26,7 @@ function logout() {
         class="text-h5 font-weight-bold"
         @click="router.push('/')"
       >
-        Voxter
+        Flixter
       </v-btn>
 
       <v-spacer />
