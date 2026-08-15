@@ -43,6 +43,20 @@ interface OmdbDetailsResponse {
   Error?: string;
 }
 
+export class OmdbError extends Error {
+  statusCode: number;
+
+  constructor(
+    message: string,
+    statusCode: number,
+  ) {
+    super(message);
+
+    this.name = 'OmdbError';
+    this.statusCode = statusCode;
+  }
+}
+
 export class OmdbService {
   private readonly baseUrl =
     'https://www.omdbapi.com';
@@ -51,8 +65,9 @@ export class OmdbService {
     const apiKey = process.env.OMDB_API_KEY;
 
     if (!apiKey) {
-      throw new Error(
+      throw new OmdbError(
         'OMDB_API_KEY não configurada',
+        500,
       );
     }
 
@@ -60,47 +75,93 @@ export class OmdbService {
   }
 
   async search(title: string) {
-    const response =
-      await axios.get<OmdbSearchResponse>(
-        this.baseUrl,
-        {
-          params: {
-            apikey: this.apiKey,
-            s: title,
+    try {
+      const response =
+        await axios.get<OmdbSearchResponse>(
+          this.baseUrl,
+          {
+            params: {
+              apikey: this.apiKey,
+              s: title,
+            },
           },
-        },
-      );
+        );
 
-    if (response.data.Response === 'False') {
-      throw new Error(
-        response.data.Error ??
-          'Nenhum título encontrado',
-      );
+      if (response.data.Response === 'False') {
+        throw new OmdbError(
+          response.data.Error ??
+            'Nenhum título encontrado',
+          404,
+        );
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error instanceof OmdbError) {
+        throw error;
+      }
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new OmdbError(
+            'Chave da OMDb inválida ou não autorizada',
+            502,
+          );
+        }
+
+        throw new OmdbError(
+          'Erro ao consultar a OMDb API',
+          502,
+        );
+      }
+
+      throw error;
     }
-
-    return response.data;
   }
 
   async findById(imdbId: string) {
-    const response =
-      await axios.get<OmdbDetailsResponse>(
-        this.baseUrl,
-        {
-          params: {
-            apikey: this.apiKey,
-            i: imdbId,
-            plot: 'full',
+    try {
+      const response =
+        await axios.get<OmdbDetailsResponse>(
+          this.baseUrl,
+          {
+            params: {
+              apikey: this.apiKey,
+              i: imdbId,
+              plot: 'full',
+            },
           },
-        },
-      );
+        );
 
-    if (response.data.Response === 'False') {
-      throw new Error(
-        response.data.Error ??
-          'Título não encontrado',
-      );
+      if (response.data.Response === 'False') {
+        throw new OmdbError(
+          response.data.Error ??
+            'Título não encontrado',
+          404,
+        );
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error instanceof OmdbError) {
+        throw error;
+      }
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new OmdbError(
+            'Chave da OMDb inválida ou não autorizada',
+            502,
+          );
+        }
+
+        throw new OmdbError(
+          'Erro ao consultar a OMDb API',
+          502,
+        );
+      }
+
+      throw error;
     }
-
-    return response.data;
   }
 }
