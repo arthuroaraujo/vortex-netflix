@@ -13,6 +13,7 @@ const router = useRouter();
 const favorites = ref<Favorite[]>([]);
 const loading = ref(true);
 const error = ref('');
+const removingId = ref<string | null>(null);
 
 async function loadFavorites() {
   loading.value = true;
@@ -30,18 +31,25 @@ async function loadFavorites() {
 }
 
 async function handleRemove(imdbId: string) {
+  if (removingId.value) {
+    return;
+  }
+
+  removingId.value = imdbId;
+  error.value = '';
+
   try {
     await removeFavorite(imdbId);
 
-    favorites.value =
-      favorites.value.filter(
-        (favorite) =>
-          favorite.imdbId !== imdbId,
-      );
+    favorites.value = favorites.value.filter(
+      (favorite) => favorite.imdbId !== imdbId,
+    );
   } catch (err: any) {
     error.value =
       err.response?.data?.message ??
       'Não foi possível remover o filme.';
+  } finally {
+    removingId.value = null;
   }
 }
 
@@ -49,21 +57,23 @@ function openMovie(imdbId: string) {
   router.push(`/movies/${imdbId}`);
 }
 
+function goToCatalog() {
+  router.push('/');
+}
+
 onMounted(loadFavorites);
 </script>
 
 <template>
   <v-container class="py-8">
-    <div class="d-flex align-center mb-8">
-      <div>
-        <h1 class="text-h4 font-weight-bold">
-          Minha Lista
-        </h1>
+    <div class="mb-8">
+      <h1 class="text-h4 font-weight-bold mb-2">
+        Minha Lista
+      </h1>
 
-        <p class="text-medium-emphasis">
-          Seus filmes e séries favoritos
-        </p>
-      </div>
+      <p class="text-medium-emphasis">
+        Seus filmes e séries favoritos
+      </p>
     </div>
 
     <v-alert
@@ -75,9 +85,10 @@ onMounted(loadFavorites);
       {{ error }}
     </v-alert>
 
+    <!-- Loading -->
     <div
       v-if="loading"
-      class="d-flex justify-center py-12"
+      class="d-flex justify-center py-16"
     >
       <v-progress-circular
         indeterminate
@@ -86,19 +97,39 @@ onMounted(loadFavorites);
       />
     </div>
 
-    <v-alert
+    <!-- Lista vazia -->
+    <div
       v-else-if="favorites.length === 0"
-      type="info"
-      variant="tonal"
+      class="empty-state text-center py-16"
     >
-      <v-alert-title>
+      <v-icon
+        size="72"
+        color="primary"
+        class="mb-6"
+      >
+        mdi-heart-outline
+      </v-icon>
+
+      <h2 class="text-h5 font-weight-bold mb-3">
         Sua lista está vazia
-      </v-alert-title>
+      </h2>
 
-      Adicione filmes à sua lista para
-      encontrá-los aqui.
-    </v-alert>
+      <p class="text-body-1 text-medium-emphasis mb-6">
+        Adicione filmes e séries aos seus favoritos
+        para encontrá-los aqui depois.
+      </p>
 
+      <v-btn
+        color="primary"
+        size="large"
+        prepend-icon="mdi-movie-search-outline"
+        @click="goToCatalog"
+      >
+        Explorar filmes
+      </v-btn>
+    </div>
+
+    <!-- Lista de favoritos -->
     <v-row v-else>
       <v-col
         v-for="favorite in favorites"
@@ -110,14 +141,26 @@ onMounted(loadFavorites);
       >
         <v-card
           height="100%"
-          class="d-flex flex-column"
+          class="favorite-card d-flex flex-column"
+          hover
+          @click="openMovie(favorite.imdbId)"
         >
           <v-img
             :src="favorite.poster"
             :alt="favorite.title"
             height="360"
             cover
-          />
+          >
+            <template #error>
+              <div
+                class="d-flex align-center justify-center fill-height"
+              >
+                <v-icon size="64">
+                  mdi-movie-open-outline
+                </v-icon>
+              </div>
+            </template>
+          </v-img>
 
           <v-card-title>
             {{ favorite.title }}
@@ -133,7 +176,7 @@ onMounted(loadFavorites);
             <v-btn
               color="primary"
               variant="text"
-              @click="openMovie(favorite.imdbId)"
+              @click.stop="openMovie(favorite.imdbId)"
             >
               Ver detalhes
             </v-btn>
@@ -144,9 +187,13 @@ onMounted(loadFavorites);
               icon="mdi-delete-outline"
               variant="text"
               color="error"
-              @click="
-                handleRemove(favorite.imdbId)
+              :loading="removingId === favorite.imdbId"
+              :disabled="
+                removingId !== null &&
+                removingId !== favorite.imdbId
               "
+              aria-label="Remover dos favoritos"
+              @click.stop="handleRemove(favorite.imdbId)"
             />
           </v-card-actions>
         </v-card>
@@ -154,3 +201,22 @@ onMounted(loadFavorites);
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.favorite-card {
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.favorite-card:hover {
+  transform: translateY(-4px);
+}
+
+.empty-state {
+  max-width: 560px;
+  margin: 0 auto;
+}
+</style>
