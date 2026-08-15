@@ -59,9 +59,7 @@ async function handleRegister() {
     return;
   }
 
-  if (
-    !/.+@.+\..+/.test(email.value)
-  ) {
+  if (!/.+@.+\..+/.test(email.value)) {
     error.value =
       "Digite um e-mail válido.";
     return;
@@ -91,9 +89,7 @@ async function handleRegister() {
       password: password.value,
     });
 
-    await router.push('/login');
-
-    await router.push("/");
+    await router.push("/login");
   } catch (err: any) {
     error.value =
       err.response?.data?.message ??
