@@ -29,6 +29,20 @@ const favoriteLoading = ref(false);
 
 const showRemoveDialog = ref(false);
 
+// Snackbar
+const snackbar = ref(false);
+const snackbarMessage = ref("");
+const snackbarColor = ref("success");
+
+function showSnackbar(
+  message: string,
+  color = "success",
+) {
+  snackbarMessage.value = message;
+  snackbarColor.value = color;
+  snackbar.value = true;
+}
+
 async function loadMovie() {
   const imdbId = route.params.imdbId;
 
@@ -89,8 +103,19 @@ async function addMovieToFavorites() {
     });
 
     isFavorite.value = true;
+
+    showSnackbar(
+      "Filme adicionado à sua lista!",
+      "success",
+    );
   } catch (err: any) {
     console.error(err);
+
+    showSnackbar(
+      err.response?.data?.message ??
+        "Não foi possível adicionar o filme.",
+      "error",
+    );
   } finally {
     favoriteLoading.value = false;
   }
@@ -116,8 +141,19 @@ async function confirmRemove() {
 
     isFavorite.value = false;
     showRemoveDialog.value = false;
+
+    showSnackbar(
+      "Filme removido da sua lista.",
+      "success",
+    );
   } catch (err: any) {
     console.error(err);
+
+    showSnackbar(
+      err.response?.data?.message ??
+        "Não foi possível remover o filme.",
+      "error",
+    );
   } finally {
     favoriteLoading.value = false;
   }
@@ -347,5 +383,24 @@ onMounted(async () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Snackbar -->
+    <v-snackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      :timeout="3000"
+      location="bottom right"
+    >
+      {{ snackbarMessage }}
+
+      <template #actions>
+        <v-btn
+          variant="text"
+          @click="snackbar = false"
+        >
+          Fechar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
