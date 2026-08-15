@@ -9,6 +9,7 @@ const authStore = useAuthStore();
 
 const email = ref("");
 const password = ref("");
+const showPassword = ref(false);
 
 const loading = ref(false);
 const error = ref("");
@@ -38,9 +39,7 @@ async function handleLogin() {
     return;
   }
 
-  if (
-    !/.+@.+\..+/.test(email.value)
-  ) {
+  if (!/.+@.+\..+/.test(email.value)) {
     error.value =
       "Digite um e-mail válido.";
     return;
@@ -100,7 +99,9 @@ async function handleLogin() {
         {{ error }}
       </v-alert>
 
-      <v-form @submit.prevent="handleLogin">
+      <v-form
+        @submit.prevent="handleLogin"
+      >
         <v-text-field
           v-model="email"
           label="E-mail"
@@ -108,17 +109,31 @@ async function handleLogin() {
           prepend-inner-icon="mdi-email-outline"
           :rules="emailRules"
           validate-on="blur"
+          autocomplete="email"
           class="mb-2"
         />
 
         <v-text-field
           v-model="password"
           label="Senha"
-          type="password"
+          :type="
+            showPassword
+              ? 'text'
+              : 'password'
+          "
           prepend-inner-icon="mdi-lock-outline"
+          :append-inner-icon="
+            showPassword
+              ? 'mdi-eye-off'
+              : 'mdi-eye'
+          "
           :rules="passwordRules"
           validate-on="blur"
+          autocomplete="current-password"
           class="mb-4"
+          @click:append-inner="
+            showPassword = !showPassword
+          "
         />
 
         <v-btn
@@ -127,6 +142,7 @@ async function handleLogin() {
           block
           size="large"
           :loading="loading"
+          :disabled="loading"
         >
           Entrar
         </v-btn>
