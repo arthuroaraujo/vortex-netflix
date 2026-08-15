@@ -12,4 +12,10 @@ router.post(
     authController.register(req, res),
 );
 
+router.post(
+  '/login',
+  (req, res) =>
+    authController.login(req, res),
+);
+
 export default router;
