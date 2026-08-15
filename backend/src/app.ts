@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import favoriteRoutes from './routes/favorite.routes.js';
 
 import authRoutes from './routes/auth.routes.js';
 import movieRoutes from './routes/movie.routes.js';
@@ -18,5 +19,6 @@ app.get('/health', (_req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/movies', movieRoutes);
+app.use('/favorites', favoriteRoutes);
 
 export default app;
